@@ -44,7 +44,11 @@ const app = express();
 const PORT: number = parseInt(process.env.PORT || '3001', 10);
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow requests from any origin (Vercel, localhost, etc)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Multer config for file uploads
