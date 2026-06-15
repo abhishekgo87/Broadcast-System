@@ -53,3 +53,9 @@ export interface Campaign {
   failed: number;
   status: 'completed' | 'partially_failed' | 'failed';
 }
+
+export interface MessageTemplate {
+  id: string;
+  name: string;
+  content: string;
+}

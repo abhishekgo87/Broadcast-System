@@ -11,7 +11,7 @@ import CampaignHistory from './components/CampaignHistory';
 import { useToast } from './hooks/useToast';
 import type { Contact, TwilioConfig, UploadResponse, SendResponse } from './types';
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'new' | 'history'>('new');
@@ -336,6 +336,7 @@ export default function App() {
                 <MessageComposer
                   message={message}
                   onChange={setMessage}
+                  API_BASE={API_BASE}
                 />
 
                 <ActionBar

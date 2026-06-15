@@ -117,6 +117,59 @@ app.get('/api/campaigns', async (req: Request, res: Response) => {
   }
 });
 
+// ==================== TEMPLATES API ====================
+
+const TEMPLATES_FILE = path.join(__dirname, 'templates.json');
+
+async function getTemplates() {
+  try {
+    const data = await fsPromises.readFile(TEMPLATES_FILE, 'utf-8');
+    return JSON.parse(data);
+  } catch (err: any) {
+    if (err.code === 'ENOENT') {
+      return [];
+    }
+    throw err;
+  }
+}
+
+app.get('/api/templates', async (req: Request, res: Response) => {
+  try {
+    const templates = await getTemplates();
+    res.json({ success: true, templates });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load templates' });
+  }
+});
+
+app.post('/api/templates', async (req: Request, res: Response) => {
+  try {
+    const { name, content } = req.body;
+    if (!name || !content) {
+      return res.status(400).json({ error: 'Name and content required' });
+    }
+    const templates = await getTemplates();
+    const newTemplate = { id: Date.now().toString(), name, content };
+    templates.push(newTemplate);
+    await fsPromises.writeFile(TEMPLATES_FILE, JSON.stringify(templates, null, 2));
+    res.json({ success: true, template: newTemplate });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save template' });
+  }
+});
+
+app.delete('/api/templates/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    let templates = await getTemplates();
+    templates = templates.filter((t: any) => t.id !== id);
+    await fsPromises.writeFile(TEMPLATES_FILE, JSON.stringify(templates, null, 2));
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete template' });
+  }
+});
+
 // Upload & Parse Excel File
 app.post('/api/upload', upload.single('file'), (req: Request, res: Response): void => {
   try {
